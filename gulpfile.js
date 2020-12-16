@@ -12,7 +12,7 @@ var path = {
   },
   src: {
     html: [SOURCE_FOLDER + "/*.html", "!" + SOURCE_FOLDER + "/_*.html"],
-    js: SOURCE_FOLDER + '/js/main.js',
+    js: SOURCE_FOLDER + '/js/script.js',
     style: SOURCE_FOLDER + '/scss/style.scss',
     img: SOURCE_FOLDER + "/img/**/*.{jpg,png,svg,gif,ico,webp}",
     fonts: SOURCE_FOLDER + '/fonts/**/*.*'
@@ -150,7 +150,6 @@ gulp.task('watch', function () {
   gulp.watch(path.watch.css, gulp.series('css:build'));
   gulp.watch(path.watch.js, gulp.series('js:build'));
   gulp.watch(path.watch.img, gulp.series('image:build'));
-  gulp.watch(path.watch.fonts, gulp.series('fonts:build'));
 });
 
 // задача по умолчанию
