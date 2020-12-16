@@ -1,6 +1,6 @@
 'use strict';
-const PROJECT_FOLDER = "dist";
-const SOURCE_FOLDER = "src";
+const PROJECT_FOLDER = 'dist';
+const SOURCE_FOLDER = 'src';
 /* пути к исходным файлам (src), к готовым файлам (build), а также к тем, за изменениями которых нужно наблюдать (watch) */
 var path = {
   build: {
@@ -11,17 +11,17 @@ var path = {
     fonts: PROJECT_FOLDER + '/fonts/'
   },
   src: {
-    html: [SOURCE_FOLDER + "/*.html", "!" + SOURCE_FOLDER + "/_*.html"],
+    html: [SOURCE_FOLDER + '/*.html', '!' + SOURCE_FOLDER + '/_*.html'],
     js: SOURCE_FOLDER + '/js/script.js',
     style: SOURCE_FOLDER + '/scss/style.scss',
-    img: SOURCE_FOLDER + "/img/**/*.{jpg,png,svg,gif,ico,webp}",
-    fonts: SOURCE_FOLDER + '/fonts/**/*.*'
+    img: SOURCE_FOLDER + '/img/**/*.{jpg,png,svg,gif,ico,webp}',
+    fonts: SOURCE_FOLDER + '/fonts/**/*.ttf'
   },
   watch: {
     html: SOURCE_FOLDER + '/**/*.html',
     js: SOURCE_FOLDER + '/js/**/*.js',
     css: SOURCE_FOLDER + '/scss/**/*.scss',
-    img: SOURCE_FOLDER + "/img/**/*.{jpg,png,svg,gif,ico,webp}",
+    img: SOURCE_FOLDER + '/img/**/*.{jpg,png,svg,gif,ico,webp}',
   },
   clean: './' + PROJECT_FOLDER + '/',
 };
@@ -33,8 +33,8 @@ var config = {
   },
   port: 3000,
   notify: false,
-  browser: "google-chrome",
-  // browser: ["google-chrome", "firefox"],
+  browser: 'google-chrome',
+  // browser: ['google-chrome', 'firefox'],
 };
 
 /* подключаем gulp и плагины */
@@ -52,7 +52,8 @@ var gulp = require('gulp'),  // подключаем Gulp
   jpegrecompress = require('imagemin-jpeg-recompress'), // плагин для сжатия jpeg	
   pngquant = require('imagemin-pngquant'), // плагин для сжатия png
   del = require('del'), // плагин для удаления файлов и каталогов
-  rename = require('gulp-rename');
+  rename = require('gulp-rename'),
+  group_media = require('gulp-group-css-media-queries');
 
 /* задачи */
 
@@ -76,7 +77,13 @@ gulp.task('css:build', function () {
     .pipe(plumber()) // для отслеживания ошибок
     .pipe(sourcemaps.init()) // инициализируем sourcemap
     .pipe(sass()) // scss -> css
-    .pipe(autoprefixer()) // добавим префиксы
+    .pipe(group_media()) // 
+    .pipe(
+      autoprefixer({
+        overrideBrowserslist: ['last 5 versions'],
+        cascade: true,
+      })
+    ) // добавим префиксы
     .pipe(gulp.dest(path.build.css))
     .pipe(rename({ suffix: '.min' }))
     .pipe(cleanCSS()) // минимизируем CSS
@@ -112,8 +119,8 @@ gulp.task('image:build', function () {
       imagemin.gifsicle({ interlaced: true }),
       jpegrecompress({
         progressive: true,
-        max: 90,
-        min: 80
+        optimizationLevel: 3,
+
       }),
       pngquant(),
       imagemin.svgo({ plugins: [{ removeViewBox: false }] })
@@ -127,9 +134,15 @@ gulp.task('clean:build', function () {
 });
 
 // очистка кэша
+/*
 gulp.task('cache:clear', function () {
   cache.clearAll();
 });
+*/
+
+gulp.task('cache:clear', () =>
+  cache.clearAll()
+);
 
 // сборка
 gulp.task('build',
